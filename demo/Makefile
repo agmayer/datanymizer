@@ -37,3 +37,7 @@ bootstrap: download create_db restore_db clean_file
 dump:
 	echo -e "\n==> Create dump"
 	docker-compose run --rm pg_datanymizer postgres://postgres:postgres@pg_database/dvdrental -c /dvdrental.yml > /tmp/fake_dump.sql
+
+down: clean_file
+	echo -e "\n==> Stop containers"
+	docker-compose down
