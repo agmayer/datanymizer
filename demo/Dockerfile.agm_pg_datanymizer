@@ -1,0 +1,15 @@
+ARG OS_VERSION=20.04
+FROM ubuntu:$OS_VERSION
+ENV OS_CODENAME=focal
+ENV PGSQL_VERSION=13
+
+RUN apt-get update && \
+    apt-get install -y wget gnupg curl
+RUN echo "deb http://apt.postgresql.org/pub/repos/apt $OS_CODENAME-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+RUN apt-get update && \
+    apt-get -y install postgresql-client-$PGSQL_VERSION
+
+RUN curl -sSfL https://raw.githubusercontent.com/datanymizer/datanymizer/main/cli/pg_datanymizer/install.sh | sh -s
+USER 1000
+ENTRYPOINT ["/bin/pg_datanymizer"]
