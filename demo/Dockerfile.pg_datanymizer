@@ -1,7 +1,16 @@
 ARG OS_VERSION=20.04
+FROM ubuntu:$OS_VERSION as aws-cli-builder
+ARG AWSCLI_VERSION=2.1.27
+
+RUN apt-get update && \
+    apt-get install -y wget gnupg curl unzip
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-$AWSCLI_VERSION.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install -i /aws-cli -b /bin
+
 FROM ubuntu:$OS_VERSION
-ENV OS_CODENAME=focal
-ENV PGSQL_VERSION=13
+ARG OS_CODENAME=focal
+ARG PGSQL_VERSION=13
 
 RUN apt-get update && \
     apt-get install -y wget gnupg curl
@@ -9,6 +18,10 @@ RUN echo "deb http://apt.postgresql.org/pub/repos/apt $OS_CODENAME-pgdg main" > 
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
 RUN apt-get update && \
     apt-get -y install postgresql-client-$PGSQL_VERSION
+
+COPY --from=aws-cli-builder /aws-cli /aws-cli
+RUN ln -s /aws-cli/v2/current/bin/aws /bin/aws && \
+    ln -s /aws-cli/v2/current/bin/aws_completer /bin/aws_completer
 
 RUN curl -sSfL https://raw.githubusercontent.com/datanymizer/datanymizer/main/cli/pg_datanymizer/install.sh | sh -s
 USER 1000

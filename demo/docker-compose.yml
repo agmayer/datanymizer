@@ -4,7 +4,7 @@ services:
   pg_datanymizer:
     build:
       context: ..
-      dockerfile: Dockerfile.pg_datanymizer
+      dockerfile: demo/Dockerfile.pg_datanymizer
     image: pg_datanymizer
     volumes:
       - ./dvdrental.yml:/dvdrental.yml
